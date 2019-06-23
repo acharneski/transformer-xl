@@ -1,10 +1,7 @@
-from collections import defaultdict
-
-import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 
 class AdaptiveLogSoftmax(nn.Module):
     def __init__(self, in_features, n_classes, cutoffs, keep_order=False):
@@ -17,7 +14,6 @@ class AdaptiveLogSoftmax(nn.Module):
                 or (max(cutoffs) >= (n_classes - 1)) \
                 or (len(set(cutoffs)) != len(cutoffs)) \
                 or any([int(c) != c for c in cutoffs]):
-
             raise ValueError("cutoffs should be a sequence of unique, positive "
                              "integers sorted in an increasing order, where "
                              "each value is between 1 and n_classes-1")
@@ -35,7 +31,6 @@ class AdaptiveLogSoftmax(nn.Module):
 
         self.keep_order = keep_order
 
-
     def forward(self, hidden, target, weight, bias, keep_order=False):
         if hidden.size(0) != target.size(0):
             raise RuntimeError('Input and target should have the same size '
@@ -50,7 +45,7 @@ class AdaptiveLogSoftmax(nn.Module):
         head_logprob = F.log_softmax(head_logit, dim=1)
 
         nll = torch.zeros_like(target,
-                dtype=hidden.dtype, device=hidden.device)
+                               dtype=hidden.dtype, device=hidden.device)
 
         offset = 0
         cutoff_values = [0] + self.cutoffs
@@ -67,7 +62,7 @@ class AdaptiveLogSoftmax(nn.Module):
             head_logprob_i = head_logprob.index_select(0, indices_i)
 
             if i == 0:
-                logprob_i = head_logprob_i.gather(1, target_i[:,None]).squeeze(1)
+                logprob_i = head_logprob_i.gather(1, target_i[:, None]).squeeze(1)
             else:
                 weight_i = weight[l_idx:h_idx]
                 bias_i = bias[l_idx:h_idx]
@@ -78,12 +73,12 @@ class AdaptiveLogSoftmax(nn.Module):
                 tail_logprob_i = F.log_softmax(tail_logit_i, dim=1)
 
                 logprob_i = head_logprob_i[:, -i] \
-                          + tail_logprob_i.gather(1, target_i[:,None]).squeeze(1)
+                            + tail_logprob_i.gather(1, target_i[:, None]).squeeze(1)
 
             if (hasattr(self, 'keep_order') and self.keep_order) or keep_order:
                 nll.index_copy_(0, indices_i, -logprob_i)
             else:
-                nll[offset:offset+logprob_i.size(0)].copy_(-logprob_i)
+                nll[offset:offset + logprob_i.size(0)].copy_(-logprob_i)
 
             offset += logprob_i.size(0)
 

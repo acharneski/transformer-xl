@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-import numpy as np
+
 
 class LogUniformSampler(object):
     def __init__(self, range_max, n_sample):
@@ -15,7 +15,7 @@ class LogUniformSampler(object):
         """
         with torch.no_grad():
             self.range_max = range_max
-            log_indices = torch.arange(1., range_max+2., 1.).log_()
+            log_indices = torch.arange(1., range_max + 2., 1.).log_()
             self.dist = (log_indices[1:] - log_indices[:-1]) / log_indices[-1]
             # print('P', self.dist.numpy().tolist()[-30:])
 
@@ -44,6 +44,7 @@ class LogUniformSampler(object):
             samp_log_probs = self.log_q[neg_samples].to(device)
             return true_log_probs, samp_log_probs, neg_samples
 
+
 def sample_logits(embedding, bias, labels, inputs, sampler):
     """
         embedding: an nn.Embedding layer
@@ -69,9 +70,9 @@ def sample_logits(embedding, bias, labels, inputs, sampler):
     hit = (labels[:, :, None] == neg_samples).detach()
 
     true_logits = torch.einsum('ijk,ijk->ij',
-        [true_w, inputs]) + true_b - true_log_probs
+                               [true_w, inputs]) + true_b - true_log_probs
     sample_logits = torch.einsum('lk,ijk->ijl',
-        [sample_w, inputs]) + sample_b - samp_log_probs
+                                 [sample_w, inputs]) + sample_b - samp_log_probs
     sample_logits.masked_fill_(hit, -1e30)
     logits = torch.cat([true_logits[:, :, None], sample_logits], -1)
 
@@ -144,4 +145,3 @@ if __name__ == '__main__':
     print('logits shape', logits.size())
     print('out_labels', out_labels.detach().numpy().tolist())
     print('out_labels shape', out_labels.size())
-

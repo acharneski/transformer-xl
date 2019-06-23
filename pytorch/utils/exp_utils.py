@@ -1,8 +1,6 @@
 import functools
-import os, shutil
-
-import numpy as np
-
+import os
+import shutil
 import torch
 
 
@@ -13,8 +11,10 @@ def logging(s, log_path, print_=True, log_=True):
         with open(log_path, 'a+') as f_log:
             f_log.write(s + '\n')
 
+
 def get_logger(log_path, **kwargs):
     return functools.partial(logging, log_path=log_path, **kwargs)
+
 
 def create_exp_dir(dir_path, scripts_to_save=None, debug=False):
     if debug:
@@ -34,6 +34,7 @@ def create_exp_dir(dir_path, scripts_to_save=None, debug=False):
             shutil.copyfile(script, dst_file)
 
     return get_logger(log_path=os.path.join(dir_path, 'log.txt'))
+
 
 def save_checkpoint(model, optimizer, path, epoch):
     torch.save(model, os.path.join(path, 'model_{}.pt'.format(epoch)))

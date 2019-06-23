@@ -1,11 +1,11 @@
-import os, sys
+import os
 import glob
 
-from collections import Counter, OrderedDict
 import numpy as np
 import torch
 
 from utils.vocabulary import Vocab
+
 
 class LMOrderedIterator(object):
     def __init__(self, data, bsz, bptt, device='cpu', ext_len=None):
@@ -38,7 +38,7 @@ class LMOrderedIterator(object):
         beg_idx = max(0, i - self.ext_len)
 
         data = self.data[beg_idx:end_idx]
-        target = self.data[i+1:i+1+seq_len]
+        target = self.data[i + 1:i + 1 + seq_len]
 
         return data, target, seq_len
 
@@ -111,10 +111,10 @@ class LMShuffledIterator(object):
                         # number of new tokens to fill in
                         n_new = min(len(streams[i]) - 1, self.bptt - n_filled)
                         # first n_retain tokens are retained from last batch
-                        data[n_retain+n_filled:n_retain+n_filled+n_new, i] = \
+                        data[n_retain + n_filled:n_retain + n_filled + n_new, i] = \
                             streams[i][:n_new]
-                        target[n_filled:n_filled+n_new, i] = \
-                            streams[i][1:n_new+1]
+                        target[n_filled:n_filled + n_new, i] = \
+                            streams[i][1:n_new + 1]
                         streams[i] = streams[i][n_new:]
                         n_filled += n_new
                 except StopIteration:
@@ -144,7 +144,7 @@ class LMShuffledIterator(object):
 
 class LMMultiFileIterator(LMShuffledIterator):
     def __init__(self, paths, vocab, bsz, bptt, device='cpu', ext_len=None,
-        shuffle=False):
+                 shuffle=False):
 
         self.paths = paths
         self.vocab = vocab
@@ -200,20 +200,20 @@ class Corpus(object):
                 os.path.join(path, 'train.txt'), ordered=True)
             self.valid = self.vocab.encode_file(
                 os.path.join(path, 'valid.txt'), ordered=True)
-            self.test  = self.vocab.encode_file(
+            self.test = self.vocab.encode_file(
                 os.path.join(path, 'test.txt'), ordered=True)
         elif self.dataset in ['enwik8', 'text8']:
             self.train = self.vocab.encode_file(
                 os.path.join(path, 'train.txt'), ordered=True, add_eos=False)
             self.valid = self.vocab.encode_file(
                 os.path.join(path, 'valid.txt'), ordered=True, add_eos=False)
-            self.test  = self.vocab.encode_file(
+            self.test = self.vocab.encode_file(
                 os.path.join(path, 'test.txt'), ordered=True, add_eos=False)
         elif self.dataset == 'lm1b':
             self.train = train_paths
             self.valid = self.vocab.encode_file(
                 os.path.join(path, 'valid.txt'), ordered=False, add_double_eos=True)
-            self.test  = self.vocab.encode_file(
+            self.test = self.vocab.encode_file(
                 os.path.join(path, 'test.txt'), ordered=False, add_double_eos=True)
 
     def get_iterator(self, split, *args, **kwargs):
@@ -259,8 +259,10 @@ def get_lm_corpus(datadir, dataset):
 
     return corpus
 
+
 if __name__ == '__main__':
     import argparse
+
     parser = argparse.ArgumentParser(description='unit test')
     parser.add_argument('--datadir', type=str, default='../data/text8',
                         help='location of the data corpus')

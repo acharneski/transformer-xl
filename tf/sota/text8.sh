@@ -23,8 +23,8 @@ TEST_BSZ=16
 TEST_NUM_CORE=2
 
 
-echo 'Preprocess test set...'
-python data_utils.py \
+echo 'Python sucks'
+/mnt/c/Users/andre/AppData/Local/Programs/Python/Python36/python.exe data_utils.py \
   --data_dir=${DATA_DIR}/ \
   --dataset=text8 \
   --tgt_len=${TEST_TGT_LEN} \
@@ -33,7 +33,7 @@ python data_utils.py \
   --use_tpu=False
 
 echo 'Run evaluation on test set...'
-python train_gpu.py \
+/mnt/c/Users/andre/AppData/Local/Programs/Python/Python36/python.exe train_gpu.py \
     --data_dir=${DATA_DIR}/tfrecords \
     --record_info_dir=${DATA_DIR}/tfrecords/ \
     --corpus_info_path=${DATA_DIR}/corpus-info.json \
