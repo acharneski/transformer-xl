@@ -2,23 +2,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import math
-import os
-from functools import partial
-
-import pickle
 import json
+import math
 import multiprocessing as mp
-
 import numpy as np
-
-from absl import flags
+import os
+import pickle
 import tensorflow as tf
-from vocabulary import Vocab
-
+from absl import flags
+from functools import partial
 from tensorflow.gfile import Exists as exists
-from tensorflow.gfile import MakeDirs as makedirs
 from tensorflow.gfile import Glob as glob
+from tensorflow.gfile import MakeDirs as makedirs
+from vocabulary import Vocab
 
 
 def _preprocess(shard, train, vocab, save_dir, cutoffs, bin_sizes, bsz, tgt_len,
